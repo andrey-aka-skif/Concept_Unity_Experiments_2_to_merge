@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace e02_Editor
+namespace E02_Editor
 {
     public class CustomScript : Editor
     {
