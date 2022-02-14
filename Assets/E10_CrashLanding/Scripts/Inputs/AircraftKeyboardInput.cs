@@ -2,23 +2,23 @@
 
 namespace E10_CrashLanding
 {
-    [RequireComponent(typeof(AircraftMover))]
+    [RequireComponent(typeof(Aircraft))]
     public class AircraftKeyboardInput : MonoBehaviour
     {
         [SerializeField] private KeyCode _upKey = KeyCode.Space;
 
-        private AircraftMover _mover;
+        private Aircraft _aircraft;
 
         private void Start()
         {
-            _mover = transform.GetComponent<AircraftMover>();
+            _aircraft = transform.GetComponent<Aircraft>();
         }
 
         private void Update()
         {
             if (Input.GetKey(_upKey))
             {
-                _mover.TryMoveUp();
+                _aircraft.Accelerate();
             }
         }
     }
