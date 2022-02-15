@@ -14,8 +14,11 @@ namespace E10_CrashLanding
 
         private void Update()
         {
-            transform.localPosition = _aircraft.Altitude * Vector3.up;
             transform.localRotation = Quaternion.Euler(0, 0, _aircraft.Pitch);
+            transform.localPosition = _aircraft.Altitude * Vector3.up;
+            transform.localPosition += _aircraft.TraveledDistance * Vector3.right;
+
+            print($"{_aircraft.Pitch} / {_aircraft.Altitude} / {_aircraft.TraveledDistance}");
         }
     }
 }

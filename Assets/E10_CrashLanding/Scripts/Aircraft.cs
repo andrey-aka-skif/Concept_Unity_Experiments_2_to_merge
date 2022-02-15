@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace E10_CrashLanding
 {
-    public class Aircraft : MonoBehaviour
+    public class Aircraft : MonoBehaviour, IFatalDamageable
     {
-        private MyLogger _logger;
-
         public event Action Died;
 
         [SerializeField] private float _minPitch = -45;
@@ -20,14 +18,20 @@ namespace E10_CrashLanding
         private bool _isLanded;
         private bool _isAcceleratingNow;
         private float _flatFlySpeed;
-        private float _groundSpeed;
-        private float _trueAirSpeed;    // TODO: пересчитать всё относительно _trueAirSpeed
-        private float _pitch;
-        private float _altitude;
 
-        public float GroundSpeed => _groundSpeed;
+        private float _trueAirSpeed;
+        private float _pitch;
+        private float _groundSpeed;
+        private float _rateOfClimb;
+        private float _altitude;
+        private float _traveledDistance;
+
+        public float TrueAirSpeed => _trueAirSpeed;
         public float Pitch => _pitch;
+        public float GroundSpeed => _groundSpeed;
+        public float RateOfClimb => _rateOfClimb;
         public float Altitude => _altitude;
+        public float TraveledDistance => _traveledDistance;
 
         public void Accelerate()
         {
@@ -44,53 +48,55 @@ namespace E10_CrashLanding
             _isLanded = true;
             _isAcceleratingNow = false;
             _flatFlySpeed = (_maxSpeed + _minSpeed) / 2;
-
-            _logger = new MyLogger();
         }
 
         private void Update()
         {
             if (_isAcceleratingNow)
-                CalculateSpeedUp();
+            {
+                CalculateTrueAirSpeedUp();
+            }
             else
-                CalculateSpeedDown();
+            {
+                CalculateTrueAirSpeedDown();
+            }
 
             CalculatePitch();
+            CalculateGroundSpeed();
+            CalculateRateOfClimb();
             CalculateAltitude();
+            CalculateTraveledDistance();
 
             _isAcceleratingNow = false;
-
-            print($"{GroundSpeed}\t{Pitch}\t{Altitude}\t{(_isLanded ? 1 : 0)}");
-            _logger.Log(GroundSpeed, Pitch, Altitude, _isLanded);
         }
 
-        private void CalculateSpeedUp()
+        private void CalculateTrueAirSpeedUp()
         {
-            _groundSpeed += _acceleration * Time.deltaTime;
+            _trueAirSpeed += _acceleration * Time.deltaTime;
 
-            if (_groundSpeed > _maxSpeed)
-                _groundSpeed = _maxSpeed;
+            if (_trueAirSpeed > _maxSpeed)
+                _trueAirSpeed = _maxSpeed;
 
-            if (_isLanded && _groundSpeed > _flatFlySpeed)
+            if (_isLanded && _trueAirSpeed > _flatFlySpeed)
                 _isLanded = false;
         }
 
-        private void CalculateSpeedDown()
+        private void CalculateTrueAirSpeedDown()
         {
-            _groundSpeed -= _acceleration * Time.deltaTime;
+            _trueAirSpeed -= _acceleration * Time.deltaTime;
 
             if (_isLanded)
             {
-                if (_groundSpeed < 0)
+                if (_trueAirSpeed < 0)
                 {
-                    _groundSpeed = 0;
+                    _trueAirSpeed = 0;
                 }
             }
             else
             {
-                if (_groundSpeed < _minSpeed)
+                if (_trueAirSpeed < _minSpeed)
                 {
-                    _groundSpeed = _minSpeed;
+                    _trueAirSpeed = _minSpeed;
                 }
             }
         }
@@ -100,23 +106,29 @@ namespace E10_CrashLanding
             if (_isLanded)
                 _pitch = 0;
             else
-                _pitch = (_groundSpeed - _minSpeed) / (_maxSpeed - _minSpeed) * (_maxPitch - _minPitch) + _minPitch;
+                _pitch = (_trueAirSpeed - _minSpeed) / (_maxSpeed - _minSpeed) * (_maxPitch - _minPitch) + _minPitch;
+        }
+
+        private void CalculateGroundSpeed()
+        {
+            float angleInRad = (Mathf.PI / 180) * _pitch;
+            _groundSpeed = _trueAirSpeed * Mathf.Cos(angleInRad);
+        }
+
+        private void CalculateRateOfClimb()
+        {
+            float angleInRad = (Mathf.PI / 180) * _pitch;
+            _rateOfClimb = _trueAirSpeed * Mathf.Sin(angleInRad);
         }
 
         private void CalculateAltitude()
         {
-            if (_isLanded)
-            {
-                _altitude = 0;
-                return;
-            }
+            _altitude += _rateOfClimb * Time.deltaTime;
+        }
 
-            float angleInGrad = (Mathf.PI / 180) * _pitch;
-
-            float dX = _groundSpeed * Time.deltaTime;
-            float dY = dX * Mathf.Tan(angleInGrad);
-
-            _altitude += dY;
+        private void CalculateTraveledDistance()
+        {
+            _traveledDistance += _groundSpeed * Time.deltaTime;
         }
     }
 }

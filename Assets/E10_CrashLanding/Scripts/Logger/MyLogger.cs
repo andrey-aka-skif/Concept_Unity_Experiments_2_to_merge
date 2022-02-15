@@ -22,11 +22,5 @@ namespace E10_CrashLanding
             using StreamWriter w = File.AppendText(_filePath);
             w.WriteLine(str);
         }
-
-        public void Log(float speed, float pitch, float altitude, bool isLanded)
-        {
-            using StreamWriter w = File.AppendText(_filePath);
-            w.WriteLine($"{speed}\t{pitch}\t{altitude}\t{(isLanded ? 1 : 0)}");
-        }
     }
 }
