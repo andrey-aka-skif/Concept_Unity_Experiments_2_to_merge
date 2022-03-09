@@ -518,7 +518,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809837644}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2502e6161894e4f41849423ce44cfd20, type: 3}
   m_Name: 
@@ -550,7 +550,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _minPitch: -45
   _maxPitch: 45
-  _minSpeed: 1
+  _minSpeed: 3
   _maxSpeed: 5
   _acceleration: 1
 --- !u!114 &809837649
@@ -871,7 +871,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!20 &1872138697
 Camera:
   m_ObjectHideFlags: 0
